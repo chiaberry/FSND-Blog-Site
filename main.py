@@ -216,16 +216,17 @@ class BlogFront(Handler):
             likes = post.likes
             likers = post.likers
             error = ""
-            if post.author == self.user.name:
-                error = "The author of a post cannot like their own post"
-            elif self.user.name in post.likers:
-                post.likes -= 1
-                post.likers.remove(self.user.name)
-                post.put()
-            else:
-                post.likes = post.likes + 1
-                post.likers.append(self.user.name)
-                post.put()
+            if self.user:
+                if post.author == self.user.name:
+                    error = "The author of a post cannot like their own post"
+                elif self.user.name in post.likers:
+                    post.likes -= 1
+                    post.likers.remove(self.user.name)
+                    post.put()
+                else:
+                    post.likes = post.likes + 1
+                    post.likers.append(self.user.name)
+                    post.put()
         time.sleep(0.2)
         self.render('front.html', posts=posts, user=self.user, error=error)
 
