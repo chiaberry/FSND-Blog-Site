@@ -1,1 +1,309 @@
+/*
+ * Override Bootstrap's default container.
+ */
 
+
+.container {
+    width: 970px;
+  }
+
+
+/*
+ * Blog posts
+ */
+
+.blog-post {
+  margin-top: 30px;
+  background-color: #eee;
+  padding: 12px;
+}
+.blog-post-title {
+  margin-bottom: 5px;
+  font-size: 30px;
+}
+.blog-post-meta {
+  margin-bottom: 20px;
+  color: #999;
+}
+
+.sign-in{
+	max-width: 660px;
+	margin: 0 auto;
+  padding:25px;
+}
+
+.sidebar{
+  border-left: white 1px solid;
+}
+
+.login{
+	max-width: 330px;
+	margin: 0 auto;
+}
+
+.error {
+	color:red;
+}
+
+.new-post{
+	width:50%;
+	display: inline-block;
+	font-size: 125%;
+}
+
+.blog-nav-item a{
+	color: white;
+}
+
+.edit-post{
+  padding: 12px;
+  background-color: #eee;
+  border-top: white 1px solid;
+}
+
+.comments{
+  margin: 24px 0;
+}
+
+.single-comment{
+  background-color: white;
+}
+
+.like-form{
+  margin-left: -13px;
+}
+
+/* SCRATCH PAD SCRATCH PAD*/
+
+/*
+/*
+ * Globals
+ */
+
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #555;
+}
+
+h1, .h1,
+h2, .h2,
+h3, .h3,
+h4, .h4,
+h5, .h5,
+h6, .h6 {
+  margin-top: 0;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: normal;
+  color: #333;
+}
+
+
+
+
+
+/*
+ * Masthead for nav
+ */
+
+.blog-masthead {
+  background-color: #428bca;
+  -webkit-box-shadow: inset 0 -2px 5px rgba(0,0,0,.1);
+          box-shadow: inset 0 -2px 5px rgba(0,0,0,.1);
+}
+
+/* Nav links */
+.blog-nav-item {
+  position: relative;
+  display: inline-block;
+  padding: 10px;
+  font-weight: 500;
+  color: #cdddeb;
+}
+
+.blog-nav-item:hover,
+.blog-nav-item:focus {
+  color: #fff;
+  text-decoration: none;
+}
+
+/* Active state gets a caret at the bottom */
+.blog-nav .active {
+  color: #fff;
+}
+.blog-nav .active:after {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 0;
+  margin-left: -5px;
+  vertical-align: middle;
+  content: " ";
+  border-right: 5px solid transparent;
+  border-bottom: 5px solid;
+  border-left: 5px solid transparent;
+}
+
+
+/*
+ * Blog name and description
+ */
+
+.blog-header {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+.blog-title {
+  margin-top: 30px;
+  margin-bottom: 0;
+  font-size: 60px;
+  font-weight: normal;
+}
+.blog-description {
+  font-size: 20px;
+  color: #999;
+}
+
+
+/*
+ * Main column and sidebar layout
+ */
+
+.blog-main {
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+/* Sidebar modules for boxing content */
+.sidebar-module {
+  padding: 15px;
+  margin: 0 -15px 15px;
+}
+.sidebar-module-inset {
+  padding: 15px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+.sidebar-module-inset p:last-child,
+.sidebar-module-inset ul:last-child,
+.sidebar-module-inset ol:last-child {
+  margin-bottom: 0;
+}
+
+
+/* Pagination */
+.pager {
+  margin-bottom: 60px;
+  text-align: left;
+}
+.pager > li > a {
+  width: 140px;
+  padding: 10px 20px;
+  text-align: center;
+  border-radius: 30px;
+}
+
+
+
+/*
+ * Footer
+ */
+
+.blog-footer {
+  padding: 40px 0;
+  color: #999;
+  text-align: center;
+  background-color: #f9f9f9;
+  border-top: 1px solid #e5e5e5;
+}
+.blog-footer p:last-child {
+  margin-bottom: 0;
+}
+*/
+/*body{
+	background-color: white;
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+h1 a {
+	color:gray;
+	text-decoration: none;
+	text-align: center;
+}
+
+h1 {
+	text-align: center;
+}
+
+h2 {
+	color:gray;
+	font-size: 110%;
+	font-variant: small-caps;
+}
+
+#wrapper {
+	margin: 0 auto;
+	width: 700px;
+	background-color: #d1e0e0;
+	padding: 20px;
+}
+
+#navbar{
+	background-color: white;
+}
+
+#content{
+	background-color: white;
+	padding: 12px;
+}
+
+#login-area{
+	float:right;
+}
+
+
+label {
+	display: block;
+	padding: 10px 0;
+}
+
+.new-post{
+	background-color: white;
+	margin: 5px 0;
+}
+
+.post{
+	padding:10px;
+}
+
+.post-heading{
+	border-bottom: 1px solid black;
+}
+
+.post-date{
+	color:rgba(0,0,0,.5);
+	display: inline-block;;
+	float:right;
+}
+
+.post-title{
+	font-size: 110%;
+	display:inline-block;
+}
+
+
+.post-title a {
+	text-decoration: none;
+	color: black;
+
+}
+
+.post-content{
+	margin: 10px 10px 15px 10px;
+}
+
+.post-footer{
+	font-size: 80%;
+	color:rgba(0,0,0,.5);
+}
+*/
