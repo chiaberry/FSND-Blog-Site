@@ -259,7 +259,7 @@ class PostPage(Handler):
         likes = post.likes
         likers = post.likers
         error = ""
-        
+
         if(self.user):
             if(self.request.get('like') == post_id):
                 if post.author == self.user.name:
@@ -274,7 +274,8 @@ class PostPage(Handler):
                     post.put()
 
             if(self.request.get('comment')):
-                c = Comment(parent=blog_key(), content=self.request.get('comment'),
+                c = Comment(parent=blog_key(),
+                            content=self.request.get('comment'),
                             post_id=int(post_id), user_id=self.user.key().id())
                 post.comment_count = post.comment_count + 1
                 post.put()
@@ -285,8 +286,8 @@ class PostPage(Handler):
 
             time.sleep(0.2)
 
-            self.render("permalink.html", post=post, user=self.user, error=error,
-                    comments=comments)
+            self.render("permalink.html", post=post, user=self.user,
+                        error=error, comments=comments)
         else:
             self.redirect("/login")
 
