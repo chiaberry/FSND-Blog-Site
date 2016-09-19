@@ -227,6 +227,8 @@ class BlogFront(Handler):
                     post.likes = post.likes + 1
                     post.likers.append(self.user.name)
                     post.put()
+            else:
+                self.redirect("/login")
         time.sleep(0.2)
         self.render('front.html', posts=posts, user=self.user, error=error)
 
@@ -257,33 +259,36 @@ class PostPage(Handler):
         likes = post.likes
         likers = post.likers
         error = ""
+        
+        if(self.user):
+            if(self.request.get('like') == post_id):
+                if post.author == self.user.name:
+                    error = "The author of a post cannot like their own post"
+                elif self.user.name in post.likers:
+                    post.likes -= 1
+                    post.likers.remove(self.user.name)
+                    post.put()
+                else:
+                    post.likes = post.likes + 1
+                    post.likers.append(self.user.name)
+                    post.put()
 
-        if(self.request.get('like') == post_id):
-            if post.author == self.user.name:
-                error = "The author of a post cannot like their own post"
-            elif self.user.name in post.likers:
-                post.likes -= 1
-                post.likers.remove(self.user.name)
+            if(self.request.get('comment')):
+                c = Comment(parent=blog_key(), content=self.request.get('comment'),
+                            post_id=int(post_id), user_id=self.user.key().id())
+                post.comment_count = post.comment_count + 1
                 post.put()
-            else:
-                post.likes = post.likes + 1
-                post.likers.append(self.user.name)
-                post.put()
+                c.put()
 
-        if(self.request.get('comment')):
-            c = Comment(parent=blog_key(), content=self.request.get('comment'),
-                        post_id=int(post_id), user_id=self.user.key().id())
-            post.comment_count = post.comment_count + 1
-            post.put()
-            c.put()
+            comments = db.GqlQuery("select * from Comment where post_id = " +
+                                   post_id + " order by created desc")
 
-        comments = db.GqlQuery("select * from Comment where post_id = " +
-                               post_id + " order by created desc")
+            time.sleep(0.2)
 
-        time.sleep(0.2)
-
-        self.render("permalink.html", post=post, user=self.user, error=error,
+            self.render("permalink.html", post=post, user=self.user, error=error,
                     comments=comments)
+        else:
+            self.redirect("/login")
 
 
 class NewPost(Handler):
