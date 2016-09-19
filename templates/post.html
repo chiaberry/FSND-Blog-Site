@@ -1,0 +1,40 @@
+<div class="blog-post">
+  <div class="row">    
+    <div class="post-heading col-md-12">
+      <div class="blog-post-title">
+        <a href="/blog/{{p.key().id()}}" alt="permalink"> {{p.subject}} </a>
+      </div>
+
+      <div class="blog-post-meta">
+        <p>{{p.created.strftime("%b %d, %Y")}} by {{p.author}}</p>
+
+      </div>
+    </div> <!--close post heading-->
+  </div>
+
+  <div class="row">
+    <div class="col-sm-10">
+      <div class="post-content">
+        <p>{{p._render_text | safe}}</p>
+      </div>
+    </div>
+
+    <div class = "col-sm-2 sidebar">
+      <form method="post" class="like-form">
+        <input type="hidden" id="like" name="like" 
+               value="{{p.key().id()}}">
+        <button type ="submit" name="like" class= "btn btn-link">
+          {{p.likes}} Likes
+        </button>
+      </form> 
+
+      {% if error %}
+        {{ error }}
+      {% endif %}
+      
+      <p><a href="/blog/{{p.key().id()}}#comments">{{ p.comment_count }} Comments</a> </p>
+    </div> 
+  </div>
+  
+  <!--Close blog post-->
+  </div>

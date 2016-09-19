@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block content %}
+  
+  {{post.render_post() | safe}}
+
+  {% if delete %}
+    <p class="error alert alert-warning">Are you sure you want to delete your post? Once deleted it can't be undone </p>
+    <form method ="post">
+      <button class="btn btn-default" type="submit" name="delete" value="delete">Delete Post</button>
+      <button class="btn btn-default" type="submit" name="cancel">Cancel </button>
+    </form>
+  {% endif %}
+   
+
+  {% if error %}
+    <div class="error alert alert-danger">
+      {{error}}
+      <a class="btn btn-default" href="/blog/{{post.key().id()}}">OK</a>
+    </div>
+  {% endif %}
+
+  {% if user %} 
+    <div class="edit-post col-sm-12 text-right">
+      <a href="/blog/edit/{{post.key().id()}}" alt="edit post"> Edit Post</a> | 
+      <a href="/blog/delete/{{post.key().id()}}" alt="delete post">Delete Post</a>
+    </div>
+  {% endif %}
+      
+  </div>
+
+   <div class="row">
+    <div class="comments">
+      <a name="comments"></a>
+      <h3>Comments</h3>
+   	  {% for c in comments %}
+      <div class="single-comment">
+        <div class="col-sm-9">
+   		     <p><strong>{{ c.getUserName() }}</strong> says at 
+           {{c.created.hour }}:{{c.created.minute}} on {{c.created.month}}/{{c.created.day}}/{{c.created.year }}: </p>
+   		     <p>{{ c.content }}</p>
+           <hr>       
+        </div>
+
+        <div class="col-sm-3">
+          {% if user %}
+            <p><small><a href="/blog/edit/{{post.key().id()}}/{{c.key().id()}}" alt="edit comment"> Edit Comment</a> </small></p> 
+            <p><small><a href="/blog/delete/{{post.key().id()}}/{{c.key().id()}}" alt="delete comment">Delete Comment</a> </small></p>
+          {% endif %}
+          <hr>
+        </div>
+      </div>
+   	  {% endfor %}
+    </div>
+   </div>
+
+
+  <div class="form-group">
+    <form method="post">
+      <p>
+        <label for="comment"><h3>Add New Comment</h3></label>
+      </p>
+      <textarea rows="5" cols="50" id="comment" name="comment" value=""> </textarea>
+      <p><button type="submit" class="btn">Submit</button></p>
+    </form>
+  </div>
+
+
+{% endblock %}

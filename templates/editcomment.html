@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>Edit Comment</h2>
+
+    <form method="post">
+
+      <div class="form-group">
+        <label for="content">Comment Content</label>
+        <textarea name="content" class="form-control" rows="6">{{content}}</textarea>
+      </div>
+
+      <div class="error">{{error}}</div>
+
+    {% if delete %}
+      </form>
+      <p class="error alert alert-warning">Are you sure you want to delete your comment? Once deleted it can't be undone </p>
+      <form method ="post">
+        <button class="btn btn-default" type="submit" name="delete" value="delete">Delete Comment</button>
+        <button class="btn btn-default" type="submit" name="cancel">Cancel </button>
+      </form>
+    {% else %}
+
+      <button type="submit" class="btn" name="submit" value="change">Submit</button>
+      <button class="btn" value="cancel">Cancel</button>
+    </form>
+
+    {% endif %}
+
+
+{% endblock %}

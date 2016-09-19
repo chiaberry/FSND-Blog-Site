@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+	{% if error %}
+		<div class="error alert alert-danger">
+      		{{error}}
+      		<a class="btn btn-default" href="/blog">OK</a>
+    	</div>
+    {% endif %}
+
+  {% for p in posts %}
+    {{ p.render_post() | safe }}
+  {% endfor %}
+
+{% endblock %}
