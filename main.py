@@ -1,10 +1,12 @@
 import os
 import re
 import random
-import hashlib
 import hmac
 import time
-from string import letters
+
+from user import User
+from comment import Comment
+from post import Post
 
 import jinja2
 import webapp2
@@ -21,7 +23,6 @@ secret = 'telephony'
 def render_str(template, **params):
     t = jinja_env.get_template(template)
     return t.render(params)
-    # This is a global function used by the Post class that Steve wrote
 
 
 def checkUsername(username):
@@ -99,107 +100,10 @@ class Handler(webapp2.RequestHandler):
         self.user = uid and User.by_id(int(uid))
 
 
-# User functions
-def make_salt(length=5):
-    return ''.join(random.choice(letters) for x in xrange(length))
-
-
-def make_pw_hash(name, pw, salt=None):
-    if not salt:
-        salt = make_salt()
-    h = hashlib.sha256(name + pw + salt).hexdigest()
-    return '%s,%s' % (salt, h)
-
-
-def valid_pw(name, password, h):
-    '''
-    takes a password input and compares to the user's hashed password
-    returns True if they match, False if they don't
-    '''
-    salt = h.split(',')[0]
-    return h == make_pw_hash(name, password, salt)
-
-
-def users_key(group='default'):
-    return db.Key.from_path('users', group)
-
-
-class User(db.Model):
-    # inherits from db.Model, which is what makes it a datastore object
-    name = db.StringProperty(required=True)
-    pw_hash = db.StringProperty(required=True)
-    email = db.StringProperty()
-
-    @classmethod  # Decorator
-    def by_id(cls, uid):
-        '''
-        Returns a User object by looking up the id
-        '''
-        return User.get_by_id(uid, parent=users_key())
-
-    @classmethod
-    def by_name(cls, name):  # This is datastore not GQL
-        '''
-        Returns a User object by looking up the name
-        '''
-        u = User.all().filter('name =', name).get()
-        return u
-
-    @classmethod
-    def register(cls, name, pw, email=None):
-        '''
-        Makes and returns a new User object
-        '''
-        pw_hash = make_pw_hash(name, pw)
-        return User(parent=users_key(),
-                    name=name,
-                    pw_hash=pw_hash,
-                    email=email)
-
-    @classmethod
-    def login(cls, name, pw):
-        '''
-        returns a User when looked up by name if the pw is valid
-        '''
-        u = cls.by_name(name)
-        if u and valid_pw(name, pw, u.pw_hash):
-            return u
-
-
 # Blog functions
 
 def blog_key(name='default'):
     return db.Key.from_path('blogs', name)
-
-
-class Post(db.Model):
-    subject = db.StringProperty(required=True)
-    content = db.TextProperty(required=True)
-    created = db.DateTimeProperty(auto_now_add=True)
-    last_modified = db.DateTimeProperty(auto_now=True)
-    author = db.StringProperty()
-    likes = db.IntegerProperty()
-    likers = db.StringListProperty()
-    comment_count = db.IntegerProperty()
-
-    def getAuthorName(self):
-        user = User.by_id(self.author)
-        return user.name
-
-    def render_post(self):
-        self._render_text = self.content.replace('\n', '<br>')
-        return render_str("post.html", p=self)
-
-
-class Comment(db.Model):
-    content = db.TextProperty(required=True)
-    post_id = db.IntegerProperty(required=True)
-    user_id = db.IntegerProperty(required=True)
-    created = db.DateTimeProperty(auto_now_add=True)
-
-    def getUserName(self):
-        user = User.by_id(self.user_id)
-        return user.name
 
 
 class BlogFront(Handler):
@@ -353,14 +257,19 @@ class EditPost(Handler):
         content = self.request.get('content')
 
         if (self.request.get('submit') == 'change'):
-            if subject and content:
-                post.subject = subject
-                post.content = content
-                post.put()
-                self.redirect('/blog/%s' % str(post.key().id()))
+            if self.user.name == post.author:
+                if subject and content:
+                    post.subject = subject
+                    post.content = content
+                    post.put()
+                    self.redirect('/blog/%s' % str(post.key().id()))
+                else:
+                    error = "Each post must include a subject and content"
+                    self.render("newpost.html", subject=subject,
+                                content=content, error=error)
             else:
-                error = "Each post must include a subject and content"
-                self.render("newpost.html", subject=subject, content=content,
+                error = "Only the post's author can edit the post."
+                self.render("newpost.html", subject-subject, content=content,
                             error=error)
         else:
             self.redirect('/blog/%s' % str(post.key().id()))
@@ -385,9 +294,14 @@ class DeletePost(Handler):
         post = db.get(key)
 
         if (self.request.get("delete")):
-            post.delete()
-            time.sleep(0.2)
-            self.redirect('/blog')
+            if self.user.name == post.author:
+                post.delete()
+                time.sleep(0.2)
+                self.redirect('/blog')
+            else:
+                msg = "Only the post's author can delete the post"
+                self.render("permalink.html", post=post, user=self.user,
+                            error=msg)
         else:
             self.redirect('/blog')
 
@@ -416,6 +330,9 @@ class EditComment(Handler):
         key = db.Key.from_path('Comment', int(comment_id), parent=blog_key())
         comment = db.get(key)
 
+        comments = db.GqlQuery("select * from Comment where post_id = " +
+                               post_id + " order by created desc")
+
         if not self.user:
             # cannot post if not logged in
             self.redirect('/blog')
@@ -423,13 +340,19 @@ class EditComment(Handler):
         content = self.request.get('content')
 
         if (self.request.get('submit') == 'change'):
-            if content:
-                comment.content = content
-                comment.put()
-                self.redirect('/blog/%s' % post_id)
+            if self.user.name == comment.getUserName():
+                if content:
+                    comment.content = content
+                    comment.put()
+                    self.redirect('/blog/%s' % post_id)
+                else:
+                    error = "Each comment must include content"
+                    self.render("editcomment.html", content=content,
+                                error=error)
             else:
-                error = "Each comment must include content"
-                self.render("editcomment.html", content=content, error=error)
+                msg = "Only the comment's author can edit a commment"
+                self.render("permalink.html", post=post, user=self.user,
+                            error=msg, comments=comments)
         else:
             self.redirect('/blog/%s' % post_id)
 
@@ -460,12 +383,20 @@ class DeleteComment(Handler):
         post = db.get(postkey)
         comment = db.get(key)
 
+        comments = db.GqlQuery("select * from Comment where post_id = " +
+                               post_id + " order by created desc")
+
         if (self.request.get("delete")):
-            comment.delete()
-            post.comment_count -= 1
-            post.put()
-            time.sleep(0.2)
-            self.redirect('/blog/%s' % post_id)
+            if self.user.name == comment.getUserName():
+                comment.delete()
+                post.comment_count -= 1
+                post.put()
+                time.sleep(0.2)
+                self.redirect('/blog/%s' % post_id)
+            else:
+                msg = "Only the comment's author can delete the comment"
+                self.render("permalink.html", post=post, user=self.user,
+                            error=msg, comments=comments)
         else:
             self.redirect('/blog/%s' % post_id)
 
